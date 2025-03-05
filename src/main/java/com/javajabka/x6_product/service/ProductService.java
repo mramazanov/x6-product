@@ -7,7 +7,9 @@ import com.javajabka.x6_product.repository.ProductRepository;
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
@@ -19,22 +21,28 @@ public class ProductService {
 
     private final ProductRepository productRepository;
 
+    @Transactional(rollbackFor = Exception.class)
     public ProductResponse createProduct(ProductRequest x6ProductRequest) {
         validate(x6ProductRequest);
-        return productRepository.createProduct(x6ProductRequest);
+        return productRepository.insert(x6ProductRequest);
     }
 
-    public ProductResponse updateProduct(final Long productId, final ProductRequest x6ProductRequest) {
-        validate(x6ProductRequest);
-        return productRepository.updateProduct(productId, x6ProductRequest);
+    @Transactional(rollbackFor = Exception.class)
+    public ProductResponse updateProduct(final Long id, final ProductRequest productRequest) {
+        validate(productRequest);
+        return productRepository.update(id, productRequest);
     }
 
-    public ProductResponse getUserById(final Long id) {
+    @Transactional(readOnly = true)
+    @Cacheable(value = "product", key = "#id")
+    public ProductResponse getProductById(final Long id) {
         return productRepository.getProductById(id);
     }
 
-    public List<Long> exists(final List<Long> listId) {
-        return productRepository.existsProduct(listId);
+    @Transactional(readOnly = true)
+    @Cacheable(value = "user", key = "#id")
+    public List<Long> exists(final List<Long> id) {
+        return productRepository.exist(id);
     }
 
     private void validate(final ProductRequest productRequest) {

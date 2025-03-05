@@ -3,10 +3,12 @@ package com.javajabka.x6_product.repository;
 import com.javajabka.x6_product.exception.BadRequestException;
 import com.javajabka.x6_product.model.ProductRequest;
 import com.javajabka.x6_product.model.ProductResponse;
-import com.javajabka.x6_product.repository.maper.ProductMaper;
+import com.javajabka.x6_product.repository.maper.ProductMapper;
 
 import lombok.RequiredArgsConstructor;
 
+import org.apache.logging.log4j.message.StringFormattedMessage;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -51,35 +53,39 @@ public class ProductRepository {
             """;
 
     private final NamedParameterJdbcTemplate jdbcTemplate;
-    private final ProductMaper productMaper;
+    private final ProductMapper productMapper;
 
-    public ProductResponse createProduct(final ProductRequest x6ProductRequest) {
-        return jdbcTemplate.queryForObject(INSERT, productToSql(null, x6ProductRequest), productMaper);
+    public ProductResponse insert(final ProductRequest productRequest) {
+        return jdbcTemplate.queryForObject(INSERT, productToSql(null, productRequest), productMapper);
     }
 
-    public ProductResponse updateProduct(final Long productId, final ProductRequest x6ProductRequest) {
-        return jdbcTemplate.queryForObject(UPDATE, productToSql(productId, x6ProductRequest), productMaper);
-    }
-
-    public List<Long> existsProduct(final List<Long> ids) {
-        return jdbcTemplate.query(EXISTS, productIdToSql(ids), (rs, rowNum) -> rs.getLong("id"));
-    }
-
-    public ProductResponse getProductById(Long productId) {
+    public ProductResponse update(final Long id, final ProductRequest productRequest) {
         try {
-            return jdbcTemplate.queryForObject(GET_BY_ID, productToSql(productId, null), productMaper);
-        } catch (Exception e){
-            throw new BadRequestException(String.format("Не удалось найти продукт с id = %d", productId));
+            return jdbcTemplate.queryForObject(UPDATE, productToSql(id, productRequest), productMapper);
+        } catch (final EmptyResultDataAccessException e) {
+            throw new BadRequestException(String.format("Не удалось найти продукт с id = %d", id));
         }
     }
 
-    private MapSqlParameterSource productToSql(final Long productId, final ProductRequest x6ProductRequest) {
+    public List<Long> exist(final List<Long> ids) {
+        return jdbcTemplate.query(EXISTS, productIdToSql(ids), (rs, rowNum) -> rs.getLong("id"));
+    }
+
+    public ProductResponse getProductById(Long id) {
+        try {
+            return jdbcTemplate.queryForObject(GET_BY_ID, productToSql(id, null), productMapper);
+        } catch (Exception e){
+            throw new BadRequestException(String.format("Не удалось найти продукт с id = %d", id));
+        }
+    }
+
+    private MapSqlParameterSource productToSql(final Long id, final ProductRequest productRequest) {
         MapSqlParameterSource params = new MapSqlParameterSource();
 
-        params.addValue("id", productId);
-        if(x6ProductRequest != null) {
-            params.addValue("name", x6ProductRequest.getName());
-            params.addValue("price", x6ProductRequest.getPrice());
+        params.addValue("id", id);
+        if(productRequest != null) {
+            params.addValue("name", productRequest.getName());
+            params.addValue("price", productRequest.getPrice());
         }
 
         return params;

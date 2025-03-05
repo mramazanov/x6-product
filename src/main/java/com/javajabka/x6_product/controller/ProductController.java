@@ -9,7 +9,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -23,20 +29,20 @@ public class ProductController {
 
     @PostMapping
     @Operation(summary = "Создать продукт")
-    public ProductResponse createProduct(ProductRequest x6ProductRequest){
-        return productService.createProduct(x6ProductRequest);
+    public ProductResponse createProduct(ProductRequest productRequest){
+        return productService.createProduct(productRequest);
     }
 
     @PatchMapping
     @Operation(summary = "Обновить продукт")
-    public ProductResponse updateProduct(final Long productId, ProductRequest x6ProductRequest){
-        return productService.updateProduct(productId, x6ProductRequest);
+    public ProductResponse updateProduct(final Long productId, ProductRequest productRequest){
+        return productService.updateProduct(productId, productRequest);
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "Получить продукт по id")
     public ProductResponse getUserById(@PathVariable final Long id) {
-        return productService.getUserById(id);
+        return productService.getProductById(id);
     }
 
     @GetMapping("/exists")
