@@ -34,8 +34,20 @@ public class RedisConfiguration {
                 ))
                 .disableCachingNullValues();
 
+        RedisCacheConfiguration productIdsExistConfiguration = RedisCacheConfiguration.defaultCacheConfig()
+                .entryTtl(Duration.ofMinutes(10))
+                .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(
+                                new StringRedisSerializer()
+                        )
+                )
+                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(
+                        new Jackson2JsonRedisSerializer<>(cacheObjectMapper, ProductResponse.class)
+                ))
+                .disableCachingNullValues();
+
         Map<String, RedisCacheConfiguration> configs = new HashMap<>();
         configs.put("product", productResponseConfiguration);
+        configs.put("productExist", productIdsExistConfiguration);
 
         return RedisCacheManager.builder(connectionFactory)
                 .withInitialCacheConfigurations(configs)

@@ -42,7 +42,7 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
-    @Cacheable(value = "product_ids", key = "#ids")
+    @Cacheable(value = "productExist", key = "#ids")
     public List<Long> exists(final List<Long> ids) {
         return productRepository.exist(ids);
     }
