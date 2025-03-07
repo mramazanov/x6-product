@@ -35,8 +35,8 @@ public class ProductController {
 
     @PatchMapping
     @Operation(summary = "Обновить продукт")
-    public ProductResponse updateProduct(final Long productId, ProductRequest productRequest){
-        return productService.updateProduct(productId, productRequest);
+    public ProductResponse updateProduct(final Long id, ProductRequest productRequest){
+        return productService.updateProduct(id, productRequest);
     }
 
     @GetMapping("/{id}")
@@ -47,8 +47,7 @@ public class ProductController {
 
     @GetMapping("/exists")
     @Operation(summary = "Проверить существование продуктов по списку id")
-    public List<Long> exists(@RequestParam final List<Long> listId) {
-        return productService.exists(listId);
+    public List<Long> exists(@RequestParam final List<Long> ids) {
+        return productService.exists(ids);
     }
-
 }

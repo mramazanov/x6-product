@@ -7,6 +7,7 @@ import com.javajabka.x6_product.repository.ProductRepository;
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,12 +23,13 @@ public class ProductService {
     private final ProductRepository productRepository;
 
     @Transactional(rollbackFor = Exception.class)
-    public ProductResponse createProduct(ProductRequest x6ProductRequest) {
-        validate(x6ProductRequest);
-        return productRepository.insert(x6ProductRequest);
+    public ProductResponse createProduct(ProductRequest productRequest) {
+        validate(productRequest);
+        return productRepository.insert(productRequest);
     }
 
     @Transactional(rollbackFor = Exception.class)
+    @CachePut(value = "product", key = "#id")
     public ProductResponse updateProduct(final Long id, final ProductRequest productRequest) {
         validate(productRequest);
         return productRepository.update(id, productRequest);
@@ -40,9 +42,9 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
-    @Cacheable(value = "user", key = "#id")
-    public List<Long> exists(final List<Long> id) {
-        return productRepository.exist(id);
+    @Cacheable(value = "product_ids", key = "#ids")
+    public List<Long> exists(final List<Long> ids) {
+        return productRepository.exist(ids);
     }
 
     private void validate(final ProductRequest productRequest) {
@@ -52,8 +54,8 @@ public class ProductService {
         if(!StringUtils.hasText(productRequest.getName())) {
             throw new BadRequestException("Введите имя продукта");
         }
-        if(productRequest.getPrice() == null || productRequest.getPrice().equals(BigDecimal.ZERO)) {
-            throw new BadRequestException("Введите корректную цену");
+        if(productRequest.getPrice() == null || productRequest.getPrice().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new BadRequestException("Введите цену больше нуля");
         }
     }
 }

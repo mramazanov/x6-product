@@ -1,5 +1,8 @@
 package com.javajabka.x6_product.model;
 
+import lombok.Getter;
+
+@Getter
 public class ApiError {
 
     private boolean success;
