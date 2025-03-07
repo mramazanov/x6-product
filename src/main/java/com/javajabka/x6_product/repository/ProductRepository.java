@@ -21,13 +21,13 @@ public class ProductRepository {
 
     private static final String INSERT = """
             INSERT INTO x6product.product (name, price, create_date)
-            VALUES (:name, :price, :createDate)
+            VALUES (:name, :price, now())
             RETURNING *
             """;
 
     private static final String UPDATE = """
            UPDATE x6product.product
-           SET name = :name, price = :price, update_date = :updateDate
+           SET name = :name, price = :price, update_date = now()
            WHERE id = :id
            RETURNING *
            """;
@@ -44,12 +44,12 @@ public class ProductRepository {
     private final ProductMapper productMapper;
 
     public ProductResponse insert(final ProductRequest productRequest) {
-        return jdbcTemplate.queryForObject(INSERT, createProductToSql(null, productRequest), productMapper);
+        return jdbcTemplate.queryForObject(INSERT, productToSql(null, productRequest), productMapper);
     }
 
     public ProductResponse update(final Long id, final ProductRequest productRequest) {
         try {
-            return jdbcTemplate.queryForObject(UPDATE, updateProductToSql(id, productRequest), productMapper);
+            return jdbcTemplate.queryForObject(UPDATE, productToSql(id, productRequest), productMapper);
         } catch (final EmptyResultDataAccessException e) {
             throw new BadRequestException(String.format("Не удалось найти продукт с id = %d", id));
         }
@@ -61,33 +61,19 @@ public class ProductRepository {
 
     public ProductResponse getProductById(Long id) {
         try {
-            return jdbcTemplate.queryForObject(GET_BY_ID, createProductToSql(id, null), productMapper);
+            return jdbcTemplate.queryForObject(GET_BY_ID, productToSql(id, null), productMapper);
         } catch (Exception e){
             throw new BadRequestException(String.format("Не удалось найти продукт с id = %d", id));
         }
     }
 
-    private MapSqlParameterSource createProductToSql(final Long id, final ProductRequest productRequest) {
+    private MapSqlParameterSource productToSql(final Long id, final ProductRequest productRequest) {
         MapSqlParameterSource params = new MapSqlParameterSource();
 
         params.addValue("id", id);
         if(productRequest != null) {
             params.addValue("name", productRequest.getName());
             params.addValue("price", productRequest.getPrice());
-            params.addValue("createDate", LocalDateTime.now());
-        }
-
-        return params;
-    }
-
-    private MapSqlParameterSource updateProductToSql(final Long id, final ProductRequest productRequest) {
-        MapSqlParameterSource params = new MapSqlParameterSource();
-
-        params.addValue("id", id);
-        if (productRequest != null) {
-            params.addValue("name", productRequest.getName());
-            params.addValue("price", productRequest.getPrice());
-            params.addValue("updateDate", LocalDateTime.now());
         }
 
         return params;

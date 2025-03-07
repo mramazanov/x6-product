@@ -12,12 +12,4 @@ public class ApiError {
         this.success = false;
         this.message = message;
     }
-
-    public boolean isSuccess() {
-        return this.success;
-    }
-
-    public String getMessage() {
-        return this.message;
-    }
 }
