@@ -4,15 +4,11 @@ import com.javajabka.x6_product.exception.BadRequestException;
 import com.javajabka.x6_product.model.ProductRequest;
 import com.javajabka.x6_product.model.ProductResponse;
 import com.javajabka.x6_product.repository.maper.ProductMapper;
-
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
-
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -33,7 +29,7 @@ public class ProductRepository {
            """;
 
     private static final String EXISTS = """
-            SELECT id FROM x6product.product WHERE id IN (:id);
+            SELECT id FROM x6product.product WHERE id IN (:ids);
             """;
 
     private static final String GET_BY_ID = """
@@ -71,7 +67,7 @@ public class ProductRepository {
         MapSqlParameterSource params = new MapSqlParameterSource();
 
         params.addValue("id", id);
-        if(productRequest != null) {
+        if (productRequest != null) {
             params.addValue("name", productRequest.getName());
             params.addValue("price", productRequest.getPrice());
         }
@@ -81,7 +77,7 @@ public class ProductRepository {
 
     private MapSqlParameterSource idsToSql(final List<Long> ids) {
         MapSqlParameterSource params = new MapSqlParameterSource();
-        params.addValue("id", ids);
+        params.addValue("ids", ids);
         return params;
     }
 }

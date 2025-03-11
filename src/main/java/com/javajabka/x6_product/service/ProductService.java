@@ -4,15 +4,12 @@ import com.javajabka.x6_product.exception.BadRequestException;
 import com.javajabka.x6_product.model.ProductRequest;
 import com.javajabka.x6_product.model.ProductResponse;
 import com.javajabka.x6_product.repository.ProductRepository;
-
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-
 import java.math.BigDecimal;
 import java.util.List;
 

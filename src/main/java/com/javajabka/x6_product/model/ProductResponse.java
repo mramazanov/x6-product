@@ -1,7 +1,7 @@
 package com.javajabka.x6_product.model;
 
-import lombok.*;
-
+import lombok.Builder;
+import lombok.Data;
 import java.math.BigDecimal;
 
 @Data
