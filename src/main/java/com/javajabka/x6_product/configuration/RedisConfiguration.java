@@ -1,5 +1,6 @@
 package com.javajabka.x6_product.configuration;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.javajabka.x6_product.model.ProductResponse;
 import org.springframework.cache.annotation.EnableCaching;
@@ -12,7 +13,9 @@ import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Configuration
@@ -33,6 +36,8 @@ public class RedisConfiguration {
                 ))
                 .disableCachingNullValues();
 
+        cacheObjectMapper.configure(DeserializationFeature.USE_LONG_FOR_INTS, true);
+
         RedisCacheConfiguration productIdsExistConfiguration = RedisCacheConfiguration.defaultCacheConfig()
                 .entryTtl(Duration.ofMinutes(10))
                 .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(
@@ -40,7 +45,8 @@ public class RedisConfiguration {
                         )
                 )
                 .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(
-                        new Jackson2JsonRedisSerializer<>(cacheObjectMapper, Boolean.class)
+                        new Jackson2JsonRedisSerializer<>(cacheObjectMapper, List.class)
+
                 ))
                 .disableCachingNullValues();
 
